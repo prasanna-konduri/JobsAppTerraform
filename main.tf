@@ -29,7 +29,7 @@ module "eks" {
     cluster_name = var.cluster_name
     cluster_version = var.cluster_version
     vpc_id = module.vpc.vpc_id
-    private_subnet_id = module.vpc.private_subnet_id
+    private_subnet_id = [module.vpc.private_subnet_id]
     instance_types = var.instance_types
     min_size = var.min_size
     max_size = var.max_size
