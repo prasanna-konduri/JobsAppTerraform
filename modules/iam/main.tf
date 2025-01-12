@@ -25,7 +25,7 @@ resource "aws_iam_role" "capstone_eks_role" {
 }
 
 // attaching policy to the role
-resource "aws_iam_role_policy_attachment" "eks-role-policy-attach" {
+resource "aws_iam_role_policy_attachment" "eks-role-policy_attachment" {
   role       = aws_iam_role.capstone_eks_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
