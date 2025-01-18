@@ -14,8 +14,12 @@ variable "vpc_id" {
     type = string
 }
 variable "private_subnet_id" {
-  description = "private subnet id"
-  type = list(string)
+  description = "List of private subnet IDs for the EKS cluster"
+  type        = list(string)
+}
+variable "public_subnet_id" {
+  description = "List of public subnet IDs for the load balancer"
+  type        = list(string)
 }
 
 variable "instance_types" {

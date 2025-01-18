@@ -14,10 +14,11 @@ provider "aws" {
 
 module "vpc" {
     source = "./modules/vpc"
-    vpc_cidr = var.aws_vpc_cidr
-    public_subnet_cidr = var.aws_public_subnet_cidr
-    private_subnet_cidr = var.aws_private_subnet_cidr
-  
+    private_subnet_count = 1
+    public_subnet_count = 1
+    vpc_cidr_block = var.aws_vpc_cidr
+    public_subnet_cidrs = var.aws_public_subnet_cidr
+    private_subnet_cidrs = var.aws_private_subnet_cidr
 }
 
 module "iam" {
@@ -30,6 +31,7 @@ module "eks" {
     cluster_version = var.cluster_version
     vpc_id = module.vpc.vpc_id
     private_subnet_id = module.vpc.private_subnet_id
+    public_subnet_id = module.vpc.public_subnet_id
     instance_types = var.instance_types
     min_size = var.min_size
     max_size = var.max_size

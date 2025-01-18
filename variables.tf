@@ -7,15 +7,15 @@ variable "aws_vpc_cidr" {
 
 variable "aws_public_subnet_cidr" {
     description = "public subnet cidr"
-    type = string
-    default = "10.0.1.0/24"
+    type = list(string)
+    default = ["10.0.1.0/24", "10.0.2.0/24"]
   
 }
 
 variable "aws_private_subnet_cidr" {
     description = "private subnet cidr"
-    type = string
-    default = "10.0.2.0/24"
+    type = list(string)
+    default = ["10.0.3.0/24", "10.0.4.0/24"]
   
 }
 
