@@ -1,5 +1,5 @@
 resource "aws_vpc" "this" {
-  cidr_block = var.vpc_cidr_block
+  cidr_block = var.vpc_cidr
   enable_dns_support = true
   enable_dns_hostnames = true
   tags = {
@@ -17,44 +17,37 @@ resource "aws_internet_gateway" "this" {
 }
 // elastic Ip
 resource "aws_eip" "nat_ip" {
-  count = length(aws_subnet.public)
   domain   = "vpc"
 }
 
 // public subnet
 resource "aws_subnet" "public" {
-  count                  = length(var.public_subnet_cidrs)
-  vpc_id                 = aws_vpc.this.id
-  cidr_block             = element(var.public_subnet_cidrs, count.index)
-  availability_zone      = element(data.aws_availability_zones.available.names, count.index)
+  vpc_id     = aws_vpc.this.id
+  cidr_block = var.public_subnet_cidr
   map_public_ip_on_launch = true
+
   tags = {
-    Name = "public-subnet-${count.index}"
-    "kubernetes.io/role/elb" = "1"
+    Name = "capstone-vpc-public-subnet"
   }
 }
 
 // private subnet
 resource "aws_subnet" "private" {
-  count                  = length(var.private_subnet_cidrs)
-  vpc_id                 = aws_vpc.this.id
-  cidr_block             = element(var.private_subnet_cidrs, count.index)
-  availability_zone      = element(data.aws_availability_zones.available.names, count.index)
-  map_public_ip_on_launch = false
+  vpc_id     = aws_vpc.this.id
+  cidr_block = var.private_subnet_cidr
+
   tags = {
-    Name = "private-subnet-${count.index}"
-    "kubernetes.io/role/internal-elb" = "1"
+    Name = "capstone-vpc-private-subnet"
   }
 }
 
 // 2. nat gateway
 resource "aws_nat_gateway" "this" {
-  count = length(aws_subnet.public)
-  allocation_id = aws_eip.nat_ip[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id
+  allocation_id = aws_eip.nat_ip.id
+  subnet_id     = aws_subnet.public.id
 
   tags = {
-    Name = "capstone-gw-NAT  ${count.index}"
+    Name = "capstone-gw-NAT"
   }
 
   # To ensure proper ordering, it is recommended to add an explicit dependency
@@ -79,8 +72,7 @@ resource "aws_route" "public_route" {
 }
 // route table association to public
 resource "aws_route_table_association" "public_association" {
-  count        = length(aws_subnet.public)
-  subnet_id      = aws_subnet.public[count.index].id
+  subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
 // route table for private subnet
@@ -93,19 +85,12 @@ resource "aws_route_table" "private" {
 }
 // route for route table
 resource "aws_route" "private_route" {
-  count = length(aws_subnet.private)
   route_table_id            = aws_route_table.private.id
   destination_cidr_block    = "0.0.0.0/0"
-  nat_gateway_id = aws_nat_gateway.this[count.index].id
+  nat_gateway_id = aws_nat_gateway.this.id
 }
 // route table association to private
 resource "aws_route_table_association" "private_association" {
-  count = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[count.index].id
+  subnet_id      = aws_subnet.private.id
   route_table_id = aws_route_table.private.id
-}
-
-
-data "aws_availability_zones" "available" {
-  state = "available"
 }

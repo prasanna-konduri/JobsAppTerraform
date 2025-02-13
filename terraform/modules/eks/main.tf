@@ -29,10 +29,10 @@ module "eks" {
       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
       ami_type       = var.ami_type
       instance_types = var.instance_types
-
       min_size     = var.min_size
       max_size     = var.max_size
       desired_size = var.desired_size
+      iam_role_arn   = var.iam_role_arn
     }
   }
 
